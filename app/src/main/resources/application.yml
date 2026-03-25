@@ -1,0 +1,14 @@
+bubun.url: ${BUBUN_URL}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate.ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  threads.virtual.enabled: true
+  jackson.default-property-inclusion: NON_NULL
+
+management.endpoint.web.exposure.include: health,info,metrics
