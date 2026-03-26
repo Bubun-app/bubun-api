@@ -12,6 +12,7 @@
 
 	<modules>
 		<module>app</module>
+		<module>db-migrations</module>
 	</modules>
 
 	<properties>
