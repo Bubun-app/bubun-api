@@ -49,7 +49,7 @@ CREATE TABLE contacts (
 
 CREATE TABLE categories (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	parent_id UUID REFERENCES categories(id),
 	name VARCHAR(100) NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -79,10 +79,10 @@ CREATE TABLE accounts (
 	currency VARCHAR(3) NOT NULL,
 	source account_source NOT NULL,
 	type account_type NOT NULL,
-	personal_percentage DECIMAL(5,2) DEFAULT 100.00
+	personal_percentage DECIMAL(5,2) NOT NULL DEFAULT 100.00
 		CHECK (personal_percentage BETWEEN 0 AND 100),
-	current_balance DECIMAL(19,4) DEFAULT 0.00,
-	is_active BOOLEAN DEFAULT TRUE,
+	current_balance DECIMAL(19,4) NOT NULL DEFAULT 0.00,
+	is_active BOOLEAN NOT NULL DEFAULT TRUE,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	deleted_at TIMESTAMPTZ
 );
@@ -93,9 +93,9 @@ CREATE TABLE account_integrations (
 	institution_id UUID NOT NULL REFERENCES institutions(id),
 	provider VARCHAR(50) NOT NULL,
 	external_account_id VARCHAR(255) NOT NULL,
-	external_requisition_id VARCHAR(255),
-	last_synced_at TIMESTAMPTZ,
-	sync_status VARCHAR(20),
+	external_requisition_id VARCHAR(255) NOT NULL,
+	last_synced_at TIMESTAMPTZ NOT NULL,
+	sync_status VARCHAR(20) NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (provider, external_account_id),
 	UNIQUE (provider, account_id)
@@ -121,14 +121,13 @@ CREATE TABLE account_transactions (
 
 CREATE TABLE account_transaction_integrations (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	account_transaction_id UUID NOT NULL REFERENCES account_transactions(id) ON DELETE CASCADE,
+	account_transaction_id UUID NOT NULL REFERENCES account_transactions(id) ON DELETE CASCADE UNIQUE,
 	provider VARCHAR(50) NOT NULL,
-	external_transaction_id VARCHAR(255),
+	external_transaction_id VARCHAR(255) NOT NULL,
 	external_internal_id UUID,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (provider, external_transaction_id),
-	UNIQUE (provider, external_internal_id),
-	UNIQUE (account_transaction_id)
+	UNIQUE (provider, external_internal_id)
 );
 
 -- ============================================
@@ -173,8 +172,8 @@ CREATE TABLE group_members (
 	group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
 	user_id UUID REFERENCES users(id) ON DELETE CASCADE,
 	balance DECIMAL(19,4) NOT NULL DEFAULT 0.00,
-	trust_mode_enabled BOOLEAN DEFAULT FALSE,
-	joined_at TIMESTAMPTZ DEFAULT NOW(),
+	trust_mode_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+	joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	left_at TIMESTAMPTZ,
 	PRIMARY KEY (group_id, user_id)
 );
@@ -209,8 +208,8 @@ CREATE TABLE group_expense_splits (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	group_expense_id UUID NOT NULL REFERENCES group_expenses(id) ON DELETE CASCADE,
 	user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-	amount_owed DECIMAL(19,4) DEFAULT 0.00 CHECK (amount_owed >= 0),
-	amount_paid DECIMAL(19,4) DEFAULT 0.00 CHECK (amount_paid >= 0),
+	amount_owed DECIMAL(19,4) NOT NULL DEFAULT 0.00 CHECK (amount_owed >= 0),
+	amount_paid DECIMAL(19,4) NOT NULL DEFAULT 0.00 CHECK (amount_paid >= 0),
 	status split_status NOT NULL DEFAULT 'PENDING',
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (group_expense_id, user_id)
@@ -227,7 +226,8 @@ CREATE TABLE group_invites (
 	token VARCHAR(255) NOT NULL UNIQUE,
 	max_uses INT NOT NULL DEFAULT 1,
 	use_count INT NOT NULL DEFAULT 0,
-	expires_at TIMESTAMPTZ NOT NULL
+	expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE settlements (
@@ -235,9 +235,9 @@ CREATE TABLE settlements (
 	group_id UUID NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
 	sender_user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
 	receiver_user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-	sender_account_transaction_id UUID REFERENCES account_transactions(id),
+	sender_account_transaction_id UUID NOT NULL REFERENCES account_transactions(id),
 	receiver_account_transaction_id UUID NOT NULL REFERENCES account_transactions(id),
-	amount DECIMAL(19,4) CHECK (amount > 0),
+	amount DECIMAL(19,4) NOT NULL CHECK (amount > 0),
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	CHECK (sender_user_id <> receiver_user_id)
 );
@@ -306,7 +306,7 @@ CREATE UNIQUE INDEX idx_users_email_unique
 	WHERE email IS NOT NULL;
 
 CREATE INDEX idx_contacts_sender ON contacts(sender_user_id);
-CREATE INDEX idx_contacts_contacted ON contacts(receiver_user_id);
+CREATE INDEX idx_contacts_receiver ON contacts(receiver_user_id);
 
 CREATE INDEX idx_categories_user ON categories(user_id);
 CREATE INDEX idx_categories_parent ON categories(parent_id);
