@@ -2,12 +2,11 @@ package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "settlements", indexes = {
@@ -17,11 +16,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class Settlement {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Settlement extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
@@ -47,9 +42,7 @@ public class Settlement {
     @DecimalMin(value = "0.00", message = "Settlement amount must be non-negative")
     private BigDecimal amount;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
+    @Builder
     public Settlement(Group group, User sender, User receiver, AccountTransaction senderAccountTransaction,
                       AccountTransaction receiverAccountTransaction, BigDecimal amount) {
         this.group = group;
@@ -58,10 +51,5 @@ public class Settlement {
         this.senderAccountTransaction = senderAccountTransaction;
         this.receiverAccountTransaction = receiverAccountTransaction;
         this.amount = amount;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

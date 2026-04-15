@@ -2,21 +2,17 @@ package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "group_invites")
 @Getter
 @NoArgsConstructor
-public class GroupInvite {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class GroupInvite extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
@@ -40,9 +36,7 @@ public class GroupInvite {
     @Column(name = "expires_at", nullable = false)
     private OffsetDateTime expiresAt;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
+    @Builder
     public GroupInvite(Group group, User inviter, String token, Integer maxUses, OffsetDateTime expiresAt) {
         this.group = group;
         this.inviter = inviter;
@@ -50,10 +44,5 @@ public class GroupInvite {
         this.maxUses = maxUses;
         this.useCount = 0;
         this.expiresAt = expiresAt;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

@@ -1,10 +1,7 @@
 package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,10 +21,12 @@ public class GroupMember {
     private Key id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("groupId")
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -46,6 +45,7 @@ public class GroupMember {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Builder
     public GroupMember(Group group, User user, Boolean trustModeEnabled) {
         this.group = group;
         this.user = user;

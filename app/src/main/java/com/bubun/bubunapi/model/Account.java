@@ -5,13 +5,13 @@ import com.bubun.bubunapi.enums.AccountType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
-import java.util.UUID;
 
 @Entity
 @Table(name = "accounts", indexes = {
@@ -20,11 +20,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class Account {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Account extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -55,12 +51,10 @@ public class Account {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
+    @Builder
     public Account(User user, String name, Currency currency, AccountSource source, AccountType type) {
         this.user = user;
         this.name = name;
@@ -70,11 +64,6 @@ public class Account {
         this.personalPercentage = new BigDecimal("100.00");
         this.currentBalance = BigDecimal.ZERO;
         this.isActive = true;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }
 

@@ -1,12 +1,13 @@
 package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.util.Set;
 
 @Entity
 @Table(name = "account_transactions", indexes = {
@@ -15,11 +16,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class AccountTransaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class AccountTransaction extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -28,6 +25,17 @@ public class AccountTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transfer_transaction_id")
     private AccountTransaction transferTransaction;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_expense_account_transactions",
+            joinColumns = @JoinColumn(name = "account_transaction_id"),
+            inverseJoinColumns = {@JoinColumn(
+                    name = "user_expense_id",
+                    referencedColumnName = "id")
+            }
+    )
+    private Set<UserExpense> userExpenses;
 
     @Column(name = "amount", nullable = false, precision = 19, scale = 4)
     private BigDecimal amount;
@@ -50,9 +58,7 @@ public class AccountTransaction {
     @Column(name = "is_manual", nullable = false)
     private Boolean isManual;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
+    @Builder
     public AccountTransaction(Account account, AccountTransaction transferTransaction, BigDecimal amount,
                               OffsetDateTime valueDateTime, OffsetDateTime bookingDateTime, String remittanceInfo,
                               String creditorName, String debtorName, Boolean isManual) {
@@ -65,10 +71,5 @@ public class AccountTransaction {
         this.creditorName = creditorName;
         this.debtorName = debtorName;
         this.isManual = isManual;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

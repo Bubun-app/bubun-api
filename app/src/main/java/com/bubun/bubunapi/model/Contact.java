@@ -2,10 +2,7 @@ package com.bubun.bubunapi.model;
 
 import com.bubun.bubunapi.enums.ContactStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -44,10 +41,10 @@ public class Contact {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Builder
     public Contact(User senderUser, User receiverUser, ContactStatus status, BigDecimal balanceFromSender) {
         this.senderUser = senderUser;
         this.receiverUser = receiverUser;
-        this.id = new Key(senderUser.getId(), receiverUser.getId());
         this.status = status;
         this.balanceFromSender = balanceFromSender;
     }

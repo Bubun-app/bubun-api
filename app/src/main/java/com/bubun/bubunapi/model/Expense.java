@@ -4,20 +4,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Currency;
-import java.util.UUID;
 
 @MappedSuperclass
 @Getter
 @NoArgsConstructor
-public class Expense implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Expense extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -39,7 +34,7 @@ public class Expense implements Serializable {
     private String description;
 
     @Column(name = "warranty_until")
-    private OffsetDateTime warrantyUntil;
+    private LocalDate warrantyUntil;
 
     @Column(name = "receipt_url", length = 500)
     private String receiptUrl;
@@ -56,11 +51,8 @@ public class Expense implements Serializable {
     @Column(name = "longitude")
     private BigDecimal longitude;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
     public Expense(Category category, BigDecimal amount, Currency currency, OffsetDateTime expenseTimestampUtc,
-                   String description, OffsetDateTime warrantyUntil, String receiptUrl, BigDecimal exchangeRate,
+                   String description, LocalDate warrantyUntil, String receiptUrl, BigDecimal exchangeRate,
                    String locationLabel, BigDecimal latitude, BigDecimal longitude) {
         this.category = category;
         this.amount = amount;
@@ -74,10 +66,5 @@ public class Expense implements Serializable {
         this.locationLabel = locationLabel;
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }
