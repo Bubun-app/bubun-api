@@ -2,11 +2,11 @@ package com.bubun.bubunapi.model;
 
 import com.bubun.bubunapi.enums.IntegrationProvider;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "account_integrations", uniqueConstraints = {
@@ -15,11 +15,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class AccountIntegration {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class AccountIntegration extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -45,9 +41,7 @@ public class AccountIntegration {
     @Column(name = "sync_status", nullable = false, length = 20)
     private String syncStatus;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
+    @Builder
     public AccountIntegration(Account account, Institution institution, IntegrationProvider provider,
                               String externalAccountId, String externalRequisitionId, OffsetDateTime lastSyncedAt,
                               String syncStatus) {
@@ -58,10 +52,5 @@ public class AccountIntegration {
         this.externalRequisitionId = externalRequisitionId;
         this.lastSyncedAt = lastSyncedAt;
         this.syncStatus = syncStatus;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

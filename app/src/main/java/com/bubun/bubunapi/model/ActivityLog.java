@@ -4,10 +4,12 @@ import com.bubun.bubunapi.enums.ActivityActionType;
 import com.bubun.bubunapi.enums.ActivityEntityType;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -18,11 +20,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class ActivityLog {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class ActivityLog extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -44,17 +42,18 @@ public class ActivityLog {
     private ActivityActionType actionType;
 
     @Column(name = "metadata", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode metadata;
 
     @Column(name = "old_data", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode oldData;
 
     @Column(name = "new_data", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode newData;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
+    @Builder
     public ActivityLog(User user, Group group, ActivityEntityType entityType, UUID entityId,
                        ActivityActionType actionType, JsonNode metadata, JsonNode oldData, JsonNode newData) {
         this.user = user;
@@ -65,10 +64,5 @@ public class ActivityLog {
         this.metadata = metadata;
         this.oldData = oldData;
         this.newData = newData;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

@@ -2,10 +2,9 @@ package com.bubun.bubunapi.model;
 
 import com.bubun.bubunapi.enums.IntegrationProvider;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "institutions", uniqueConstraints = {
@@ -13,11 +12,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class Institution {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Institution extends BaseEntity {
 
     @Column(name = "provider", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
@@ -32,6 +27,7 @@ public class Institution {
     @Column(name = "logo_url", nullable = false, length = 250)
     private String logoUrl;
 
+    @Builder
     public Institution(IntegrationProvider provider, String externalInstitutionId, String name, String logoUrl) {
         this.provider = provider;
         this.externalInstitutionId = externalInstitutionId;

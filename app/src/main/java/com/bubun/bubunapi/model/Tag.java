@@ -1,29 +1,21 @@
 package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tags")
 @Getter
 @NoArgsConstructor
-public class Tag {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Tag extends BaseEntity {
 
     @Column(name = "name", nullable = false, length = 50)
     private String name;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
@@ -45,16 +37,12 @@ public class Tag {
                     referencedColumnName = "id")
             }
     )
-    private Set<UserExpense> groupExpenses;
+    private Set<GroupExpense> groupExpenses;
 
+    @Builder
     public Tag(String name) {
         this.name = name;
         this.userExpenses = new HashSet<>();
         this.groupExpenses = new HashSet<>();
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
     }
 }

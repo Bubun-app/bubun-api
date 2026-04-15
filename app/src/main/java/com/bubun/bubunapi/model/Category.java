@@ -1,13 +1,12 @@
 package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "categories", indexes = {
@@ -16,11 +15,7 @@ import java.util.UUID;
 })
 @Getter
 @NoArgsConstructor
-public class Category {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Category extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -36,23 +31,12 @@ public class Category {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    public Category(User user, String name) {
+    @Builder
+    public Category(User user, Category parent, String name) {
         this.user = user;
         this.name = name;
-        this.children = new HashSet<>();
-    }
-
-    public Category(User user, Category parent, String name) {
-        this(user, name);
         this.parent = parent;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
+        this.children = new HashSet<>();
     }
 }
 

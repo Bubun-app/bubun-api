@@ -2,10 +2,12 @@ package com.bubun.bubunapi.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.HashSet;
@@ -31,9 +33,10 @@ public class GroupExpense extends Expense {
     @ManyToMany(mappedBy = "groupExpenses", fetch = FetchType.LAZY)
     private Set<Tag> tags;
 
+    @Builder
     public GroupExpense(Category category, BigDecimal amount, Currency currency, OffsetDateTime expenseTimestampUtc,
-                       String description, OffsetDateTime warrantyUntil, String receiptUrl, BigDecimal exchangeRate,
-                       String locationLabel, BigDecimal latitude, BigDecimal longitude, Group group, User creator) {
+                        String description, LocalDate warrantyUntil, String receiptUrl, BigDecimal exchangeRate,
+                        String locationLabel, BigDecimal latitude, BigDecimal longitude, Group group, User creator) {
         super(category, amount, currency, expenseTimestampUtc, description, warrantyUntil, receiptUrl, exchangeRate,
                 locationLabel, latitude, longitude);
         this.group = group;
