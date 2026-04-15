@@ -65,6 +65,7 @@ CREATE TABLE institutions (
 	external_institution_id VARCHAR(100) NOT NULL,
 	name VARCHAR(100) NOT NULL,
 	logo_url VARCHAR(250) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (provider, external_institution_id)
 );
 
@@ -124,7 +125,7 @@ CREATE TABLE account_transaction_integrations (
 	account_transaction_id UUID NOT NULL REFERENCES account_transactions(id) ON DELETE CASCADE UNIQUE,
 	provider VARCHAR(50) NOT NULL,
 	external_transaction_id VARCHAR(255) NOT NULL,
-	external_internal_id UUID,
+	external_internal_id VARCHAR(255),
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (provider, external_transaction_id),
 	UNIQUE (provider, external_internal_id)
@@ -175,6 +176,7 @@ CREATE TABLE group_members (
 	trust_mode_enabled BOOLEAN NOT NULL DEFAULT FALSE,
 	joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	left_at TIMESTAMPTZ,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	PRIMARY KEY (group_id, user_id)
 );
 
@@ -198,6 +200,7 @@ CREATE TABLE group_expenses (
 	location_label VARCHAR(255),
 	latitude DECIMAL(9,6),
 	longitude DECIMAL(9,6),
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	CHECK (
 		(latitude IS NULL AND longitude IS NULL)
 		OR (latitude IS NOT NULL AND longitude IS NOT NULL)
