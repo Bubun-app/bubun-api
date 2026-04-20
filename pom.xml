@@ -13,22 +13,24 @@
 	<modules>
 		<module>app</module>
 		<module>db-migrations</module>
-	</modules>
+        <module>gocardless-client-starter</module>
+    </modules>
 
 	<properties>
 		<java.version>25</java.version>
 
 		<!--Dependencies-->
-		<com.h2database>2.3.232</com.h2database>
-		<org.flyway.version>11.10.2</org.flyway.version>
-		<org.junit.jupiter.version>5.13.3</org.junit.jupiter.version>
+		<com.h2database>2.4.240</com.h2database>
+		<org.flyway.version>12.3.0</org.flyway.version>
+		<org.junit.jupiter.version>6.0.3</org.junit.jupiter.version>
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
-		<org.openapitools.version>0.2.6</org.openapitools.version>
-		<org.openapitools.plugin.version>7.14.0</org.openapitools.plugin.version>
-		<org.postgresql>42.7.7</org.postgresql>
-		<org.projectlombok.version>1.18.38</org.projectlombok.version>
-		<org.springdoc.version>2.8.9</org.springdoc.version>
-		<org.springframework.boot.version>3.5.3</org.springframework.boot.version>
+		<org.mockito.version>5.20.0</org.mockito.version>
+		<org.openapitools.version>0.2.10</org.openapitools.version>
+		<org.openapitools.plugin.version>7.21.0</org.openapitools.plugin.version>
+		<org.postgresql>42.7.10</org.postgresql>
+		<org.projectlombok.version>1.18.44</org.projectlombok.version>
+		<org.springdoc.version>3.0.2</org.springdoc.version>
+		<org.springframework.boot.version>4.0.5</org.springframework.boot.version>
 
 		<!--Plugins-->
 		<org.apache.maven.plugins>3.11.0</org.apache.maven.plugins>
@@ -55,6 +57,11 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${org.springframework.boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-webflux</artifactId>
 				<version>${org.springframework.boot.version}</version>
 			</dependency>
 			<dependency>
@@ -176,6 +183,18 @@
 						</annotationProcessorPaths>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.2.5</version>
+					<configuration>
+						<argLine>
+							-javaagent:${settings.localRepository}/org/mockito/mockito-core/${org.mockito.version}/mockito-core-${org.mockito.version}.jar
+						</argLine>
+					</configuration>
+				</plugin>
+
 
 				<plugin>
 					<groupId>org.openapitools</groupId>

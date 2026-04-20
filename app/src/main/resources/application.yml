@@ -1,5 +1,11 @@
 bubun.url: ${BUBUN_URL}
 
+gocardless:
+  api-url: ${GOCARDLESS_API_URL}
+  secret-id: ${GOCARDLESS_SECRET_ID}
+  secret-key: ${GOCARDLESS_SECRET_KEY}
+  resilience.enabled: true
+
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}

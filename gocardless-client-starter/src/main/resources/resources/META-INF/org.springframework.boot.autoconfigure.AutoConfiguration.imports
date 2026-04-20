@@ -1,0 +1,4 @@
+com.bubun.gocardless.configuration.GoCardlessApiAutoConfiguration
+com.bubun.gocardless.configuration.GoCardlessResilienceAutoConfiguration
+com.bubun.gocardless.service.GoCardlessTokenService
+
