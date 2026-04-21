@@ -3,12 +3,14 @@ package com.bubun.gocardless.service;
 import com.bubun.gocardless.api.TokenApi;
 import com.bubun.gocardless.configuration.GoCardlessProperties;
 import com.bubun.gocardless.exception.GoCardlessTokenException;
+import com.bubun.gocardless.model.GoCardlessRetryListener;
 import com.bubun.gocardless.model.GoCardlessTokenState;
 import com.bubun.gocardless.model.JWTObtainPairRequest;
 import com.bubun.gocardless.model.JWTRefreshRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.core.retry.*;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -32,11 +34,11 @@ public class GoCardlessTokenService {
 
     private volatile GoCardlessTokenState state;
 
-    public GoCardlessTokenService(TokenApi api, GoCardlessProperties properties) {
+    public GoCardlessTokenService(TokenApi api, GoCardlessProperties properties, GoCardlessRetryListener retryListener) {
         this.api = api;
         this.secretId = properties.secretId();
         this.secretKey = properties.secretKey();
-        this.retryTemplate = createRetryTemplate();
+        this.retryTemplate = createRetryTemplate(retryListener);
     }
 
     public String getValidAccessToken() {
@@ -156,7 +158,7 @@ public class GoCardlessTokenService {
         return false;
     }
 
-    private RetryTemplate createRetryTemplate() {
+    private RetryTemplate createRetryTemplate(GoCardlessRetryListener retryListener) {
         var retryPolicy = RetryPolicy.builder()
                 .maxRetries(MAX_RETRY_ATTEMPTS)
                 .delay(MAX_RETRY_DELAY_SECONDS)
@@ -164,14 +166,7 @@ public class GoCardlessTokenService {
                 .predicate(this::isRetryableException)
                 .build();
         var template = new RetryTemplate(retryPolicy);
-        template.setRetryListener(new RetryListener() {
-            @Override
-            public void onRetryFailure(@NonNull RetryPolicy policy,
-                                       @NonNull Retryable<?> retryable,
-                                       @NonNull Throwable throwable) {
-                log.debug("Retry failed for {}: {}", retryable.getName(), throwable.getMessage());
-            }
-        });
+        template.setRetryListener(retryListener);
         return template;
     }
 }

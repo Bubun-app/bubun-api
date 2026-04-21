@@ -3,6 +3,7 @@ package com.bubun.gocardless.service;
 import com.bubun.gocardless.api.TokenApi;
 import com.bubun.gocardless.configuration.GoCardlessProperties;
 import com.bubun.gocardless.exception.GoCardlessTokenException;
+import com.bubun.gocardless.model.GoCardlessRetryListener;
 import com.bubun.gocardless.model.GoCardlessTokenState;
 import com.bubun.gocardless.model.SpectacularJWTObtain;
 import com.bubun.gocardless.model.SpectacularJWTRefresh;
@@ -46,7 +47,7 @@ class GoCardlessTokenServiceTest {
                 "secret-id",
                 "secret-key"
         );
-        service = new GoCardlessTokenService(api, props);
+        service = new GoCardlessTokenService(api, props, new GoCardlessRetryListener());
     }
 
     @Test
